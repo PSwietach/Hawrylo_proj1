@@ -1,0 +1,34 @@
+library(here)
+library(raster)
+library(RStoolbox)
+library(sf)
+
+
+r <- stack(here("data", "HySpex_K3.dat"), bands = seq(1 , 430, 4))
+r
+
+#analiza PCA
+
+pca <- readRDS("pca.rds")
+pca <- pca$map 
+writeRaster(pca, "pca_r.tif", overwrite = T)
+
+
+#Obliczenie NDVI ~~ (NIR-RED)/(NIR+RED)
+ndvi ,_ (nir - red)/(nir + red)
+ndvi <- (r$band.125.refl....100...0.810510.Micrometers. - r$band.85.refl....100...0.682640.Micrometers.)/(r$band.125.refl....100...0.810510.Micrometers. + r$band.85.refl....100...0.682640.Micrometers.)
+plot(ndvi)
+writeRaster(ndvi, "ndvi.tif", overwirte = T)
+
+ndvi[ndvi < 0.65] <- NA
+writeRaster(ndvi, "ndvi0.65.tif", overwirte = T)
+
+chm <- raster(here("data", "CHM.tif"))
+plot(chm)
+chm[chm < 5] <- NA
+names(ndvi) <- "ndvi"
+writeRaster(chm, "chm_5m.tif", overwrite = T)
+
+#łączenie wartsw projektu = musi mieć taki sam zasięg i ten sam pxl= przebróbkowanie
+r <- stack(r, ndvi, chm )
+names(r)
